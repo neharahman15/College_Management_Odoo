@@ -1,0 +1,31 @@
+<odoo noupdate="1">
+
+    <record id="product_course_cs" model="product.template">
+        <field name="name">Computer Science</field>
+        <field name="type">service</field>
+        <field name="is_course">True</field>
+        <field name="list_price">10000</field>
+    </record>
+
+    <record id="product_course_commerce" model="product.template">
+        <field name="name">Commerce</field>
+        <field name="type">service</field>
+        <field name="is_course">True</field>
+        <field name="list_price">20000</field>
+    </record>
+
+    <record id="product_course_math" model="product.template">
+        <field name="name">Mathematics</field>
+        <field name="type">service</field>
+        <field name="is_course">True</field>
+        <field name="list_price">25000</field>
+    </record>
+
+    <record id="product_course_physics" model="product.template">
+        <field name="name">Physics</field>
+        <field name="type">service</field>
+        <field name="is_course">True</field>
+        <field name="list_price">3000</field>
+    </record>
+
+</odoo>

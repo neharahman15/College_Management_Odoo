@@ -1,0 +1,10 @@
+<odoo>
+   <record id="ir_sequence_admission_management" model="ir.sequence">
+       <field name="name">Student Admission Numbers</field>
+       <field name="code">admission.number</field>
+       <field name="prefix">ADM/</field>
+       <field name="padding">4</field>
+       <field name="number_increment">1</field>
+       
+   </record>
+</odoo>

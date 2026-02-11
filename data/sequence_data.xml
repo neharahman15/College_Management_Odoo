@@ -1,0 +1,12 @@
+
+
+<odoo>
+   <record id="ir_sequence_student_management" model="ir.sequence">
+       <field name="name">Students Sequence Numbers</field>
+       <field name="code">student.data</field>
+       <field name="prefix">STU/</field>
+       <field name="padding">4</field>
+       <field name="number_increment">1</field>
+       
+   </record>
+</odoo>

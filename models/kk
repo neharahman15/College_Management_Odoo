@@ -1,0 +1,14 @@
+return {
+        'type': 'ir.actions.act_window',
+        'name': 'Invoices',
+        'view_mode': 'tree,form',
+        'res_model': 'account.move',
+        'domain': [
+            ('admission_id', '=', self.id),
+            ('move_type', '=', 'out_invoice')
+        ],
+        'context': {
+            'default_admission_id': self.id,
+            'default_move_type': 'out_invoice'
+        }
+    }

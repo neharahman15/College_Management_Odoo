@@ -1,0 +1,106 @@
+<odoo>
+    <record id="student_admission_form" model="ir.ui.view">
+        <field name="name">student.admission.form</field>
+        <field name="model">college.student.admission</field>
+        <field  name="arch" type="xml">
+            <form>
+                <header>
+                    <field name='status' widget="statusbar"/>
+
+                    <button name="action_submit" type="object" 
+                            string="Submit for Approval" 
+                            class="btn-primary"
+                            invisible ="status != 'draft'"/>
+                    <button name="action_cancel" type="object"
+                            string="Cancel"
+                            class="btn-primary"
+                            invisible="status != 'submitted'"/>
+                    <button name="action_approve" type="object"
+                            string="Approve"
+                            class="btn-primary"
+                            invisible="status != 'submitted'"/>
+                    <button name="action_reject" type="object"
+                            string="Reject"
+                            class="btn-primary"
+                            invisible="status != 'submitted'"/>
+                     <button name="action_rejected" type="object"
+                            string="Reset to Draft"
+                            class="btn-primary"
+                            invisible="status != 'rejected'"/>
+                     <button name="action_create_invoice" type="object"
+                            string="Create Semester Invoice"
+                            invisible="not pending_semester and status !='approved'" />
+                    
+                </header>
+                <sheet>
+                 <div class="oe_button_box" name="button_box">
+                    <button name="action_view_invoice" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible="invoice_count == 0">
+                        <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                    </button>
+                </div>
+                    <h1>
+                        <field name="Admission_Number" nolabel="1"/>
+                    </h1>
+                    <group>
+                        <group string='Basic Details'>
+                            <field name="name"/>
+                            <field name="responsible"/>
+                            <field name="admission_date"/>
+                        </group>
+                        <group string='Academic Details'>
+                            <field name="course"/>
+                            <field name="assigned_teacher"/>
+                            <field name="departmentt"/>
+                        </group>
+                    </group>
+                    <group string="Fee Overview">
+                        <field name="total_course_fee"/>
+                        <field name="paid_amount"/>
+                        <field name="balance_amount"/>
+                    </group>
+                    <notebook>
+                        <page string='semester plan'>
+                            <field name="admission_semesterline_ids" >
+                                <list editable="bottom" delete="false" create="false" force_save="1">
+                                    <field name="semester_number" readonly='True' force_save="1"/>
+                                    <field name="semester_start_date" readonly='True' force_save="1" />
+                                    <field name="semester_end_date" readonly='True' force_save="1"/>
+                                    <field name="duration" readonly='True' force_save="1" />
+                                    <field name="semester_fee" readonly='True' force_save="1"/>
+                                    <field name="due_date"/>
+                                    <field name="fee_status" readonly='True'/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="student_admission_list" model="ir.ui.view">
+        <field name="name">field_value</field>
+        <field name="model">college.student.admission</field>
+        <field  name="arch" type="xml">
+            <list>
+                <field name="Admission_Number"/>
+                <field name="name"/>
+                <field name="course"/>
+            </list>
+        </field>
+    </record>
+    <record id="college_student_admission_action" model="ir.actions.act_window">
+        <field name="name">Student Admission</field>
+        <field name="res_model">college.student.admission</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem
+    id="college_admission_menu"
+    name="Admissions"
+    parent="menu_college_root"/>
+    <menuitem
+    id="college_student_admission_menu"
+    name="Student Admissions"
+    parent="college_admission_menu"
+    action="college_student_admission_action"/>
+</odoo>

@@ -1,0 +1,26 @@
+<odoo>
+    <record id="view_college_courses_list" model="ir.ui.view">
+        <field name="name">Courses</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" string="Course"/>
+                <field name="list_price" string="Course Fee"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_college_course" model="ir.actions.act_window">
+        <field  name="name">Courses</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">list,form,kanban</field>
+        <field name="view_id" ref='view_college_courses_list'/>
+        <field name="domain">[('is_course','=',True)]</field>
+    </record>
+    <menuitem id="menu_college_configuration"
+            name="Configuration"
+            parent="menu_college_root"/>
+    <menuitem id="menu_courses"
+    name="Courses"
+    parent="menu_college_configuration"
+    action="action_college_course"/>
+</odoo>

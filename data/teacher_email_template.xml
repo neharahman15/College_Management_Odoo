@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+   <record id="email_template_teacher_admission" model="mail.template">
+       <field name="name">Fee Pending:Reminder to Teacher</field>
+       <field name="model_id" ref="college_management.model_college_student_admission"/>
+        <field name="subject">Fee Pending Reminder</field>
+       <field name="email_from">noreply@example.com</field> 
+       <field name="email_to">{{object.assigned_teacher.email}}</field>
+        <field name="description">Sent automatically to teacher when fee is pending</field>
+
+       <field name="body_html" type="html">
+               <p>Hi <t t-out="object.assigned_teacher.name"/>,</p>
+               <p>This is a reminder</p>
+               <p> Your Student <strong><t t-out="object.name.name"/></strong> have pending fees</p>
+               <br/>
+               <p>Best regards,<br/>School Team</p>
+       </field>
+   </record>
+</odoo>
+

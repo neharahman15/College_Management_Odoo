@@ -1,0 +1,30 @@
+<!-- <odoo>
+    <record id="college_courses_list" model="ir.ui.view">
+        <field name="name">college.courses.list</field>
+        <field name="model">college.courses</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="course_name"/>
+                <field name="course_fee" />
+
+            </list>
+        </field>
+    </record>
+
+    <record id="action_college_course" model="ir.actions.act_window">
+    <field name="name">Courses</field>
+    <field name="res_model">college.courses</field>
+    <field name="view_mode">list,form</field>
+</record>
+
+
+    <menuitem id="menu_college_configuration"
+    name="Configuration"
+    parent="menu_college_root"/>
+
+    <menuitem id="college_configuration_course"
+    name="Courses"
+    parent="menu_college_configuration"
+    action="action_college_course"/>
+</odoo> -->
+
