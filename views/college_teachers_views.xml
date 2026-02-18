@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <list>
                 <field name="reference_num" />
-                <field name="name"/>
+                <field name="user_id"/>
                 <field name="email"/>
                 <field name="mobile"/>
                 <field name="department"/>
@@ -24,7 +24,7 @@
                         <field name="reference_num" />
                     </h1>
                     <group string="INFO">
-                        <field name="name"/>
+                        <field name="user_id"/>
                         <div class="d-flex align-items-baseline w-md-50" colspan="2">
                                     <i class="fa fa-fw me-1 fa-envelope text-primary" title="Email"/>
                                     <field name="email" class="w-100" widget="email" placeholder="Email"/>
@@ -51,7 +51,7 @@
                     <t t-name="card">
                         <div class="o_kanban_card oe_kanban_global_click">
                             <strong>
-                                <field name="name"/>
+                                <field name="user_id"/>
                             </strong>
                             <div>
                                 <field name="department"/>

@@ -9,11 +9,17 @@
         <field name="description">Sent automatically to teacher when fee is pending</field>
 
        <field name="body_html" type="html">
-               <p>Hi <t t-out="object.assigned_teacher.name"/>,</p>
+               <p>Hi <t t-out="object.assigned_teacher.user_id.name"/>,</p>
                <p>This is a reminder</p>
-               <p> Your Student <strong><t t-out="object.name.name"/></strong> have pending fees</p>
+               <p> Your Student  <strong><t t-out="object.name.name"/></strong>  have pending fees in semester number
+    
+                <t t-foreach="object.admission_semesterline_ids" t-as="line">
+                     <strong><t t-if="line.fee_status == 'pending'" t-out="line.semester_number"/></strong>                  
+                     </t>
+                   
+               </p>
                <br/>
-               <p>Best regards,<br/>School Team</p>
+               <p>Best regards,<br/>School Team</p> 
        </field>
    </record>
 </odoo>

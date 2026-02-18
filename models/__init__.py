@@ -4,3 +4,4 @@ from . import college_teachers
 from . import product_template
 from . import college_semesterlines
 from . import account_move
+

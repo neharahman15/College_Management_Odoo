@@ -8,7 +8,7 @@ class CollegeStudents(models.Model):
     _order = 'id desc'
     _inherits = {'res.partner': 'partner_id'}
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _rec_name="name"
+    # _rec_name="name"
    
     partner_id=fields.Many2one('res.partner',string='Student Name',ondelete="cascade", required=True)
     # name=fields.Char(string="Student Name",on_delete='cascade')
@@ -77,20 +77,5 @@ class CollegeStudents(models.Model):
         students = self.search_fetch(domain, limit=limit)
         return [(s.id, s.name) for s in students]
 
-    
-    # @api.model
-    # def name_search(self, name='', domain=None, operator='ilike', limit=100):
-    #    domain = list(domain or [])
-    #    if not name:
-    #        return super().name_search(name, domain,operator,limit)
-    #    domain = ['|', '|',
-    #              ('name', operator, name),
-    #              ('email', operator, name),
-    #              ('mobile', operator, name)]
-    #    if domain:
-    #        domain = ['&'] + domain
-    #    students = self.search_fetch(domain, ['name'], limit=limit)
-    #    return [(student.id, student.name) for student in studentss]
-       
-   
+
         

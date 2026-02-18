@@ -4,6 +4,7 @@ from odoo.exceptions import ValidationError
 
 
 class CollegeSemesterLines(models.Model):
+
     _name="college.semesterlines"
     _description="college Semester"
 
@@ -27,6 +28,7 @@ class CollegeSemesterLines(models.Model):
         'college.student.admission',
         ondelete='cascade'
     )
+    
     
 
 

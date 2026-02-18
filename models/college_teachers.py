@@ -8,13 +8,12 @@ class CollegeTeachers(models.Model):
     _description='College Teachers'   
     _order = 'id desc'
     _inherit = ['mail.thread', 'mail.activity.mixin']
+    _rec_name='user_id'
 
-
-    name=fields.Char(string="Teacher Name")
+    user_id=fields.Many2one('res.users',string="Teacher")
     email=fields.Char(string="Email")
     mobile=fields.Char()
-    department=fields.Char()
-    
+    department=fields.Char(string="DEpartment")
     reference_num=fields.Char(string="sequence",copy=False,default="New",readonly=True)
 
 

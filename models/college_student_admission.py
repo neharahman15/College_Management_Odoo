@@ -24,10 +24,9 @@ class CollegeStudentAdmission(models.Model):
                             domain=[('is_course', '=' ,True)],)
 
     assigned_teacher=fields.Many2one('college.teachers',
-                                        string="Teacher",
-                                        required=True)
+                                        string="Teacher",)
 
-    departmentt=fields.Char(related='assigned_teacher.department')
+    department=fields.Char(related='assigned_teacher.department')
 
     total_course_fee=fields.Float(related='course.list_price' ,string='Course fee')
 
@@ -50,9 +49,17 @@ class CollegeStudentAdmission(models.Model):
         'admission_id')
 
     invoice_count=fields.Integer(compute='_compute_invoice_count')
+
+# relation to invoice / to get paid amount field from invoice
     invoice_id=fields.One2many('account.move',
                                 'admission_id')
 
+# Create invoive visible field 
+    pending_semester=fields.Boolean(compute="_fee_status_is_pending",
+                                    string="is_pending")
+
+
+#Admission Number Generation
 
     @api.model_create_multi
 
@@ -68,11 +75,7 @@ class CollegeStudentAdmission(models.Model):
         res=super().create(vals)
         return res
     
-    # @api.onchange('course')
-    # def _onchange_course(self):
-    #     if self.course:
-    #         self.admission_semesterline_ids=self.course.semester_ids
-
+#fetch semesterlines while course is selected
 
     @api.onchange('course')
 
@@ -99,14 +102,20 @@ class CollegeStudentAdmission(models.Model):
                 }))
             self.admission_semesterline_ids=admission_semester_lines
 
+#button action
 
     def action_submit(self):
+        
         self.status='submitted'
 
     def action_cancel(self):
+
         self.status='draft'
 
+#approve->fist semester=pending
+
     def action_approve(self):
+
         for rec in self:
             rec.status='approved'
             if rec.admission_semesterline_ids:
@@ -118,12 +127,21 @@ class CollegeStudentAdmission(models.Model):
             if student_template:
                 student_template.send_mail(rec.id,force_send=False)
 
+           
             teacher_template = self.env.ref(
-                            'college_management.email_template_teacher_admission')
-                                        
+                                    'college_management.email_template_teacher_admission')
+                                                
             if teacher_template:
                 teacher_template.send_mail(rec.id,force_send=False)
 
+            activity = self.env['mail.activity'].create({
+            'summary': 'Follow Up',
+            'note': 'Schedule follow up with student',
+            'res_model_id': self.env['ir.model']._get_id('college.student.admission'),
+            'res_id': self.id,
+            'user_id': self.assigned_teacher.user_id.id,
+            'date_deadline':fields.Date.today()
+        })
 
     def action_reject(self):
         self.status='rejected'
@@ -131,53 +149,95 @@ class CollegeStudentAdmission(models.Model):
     def action_rejected(self):
         self.status='draft'
 
-    # def action_create_invoice(self):
-    #     self.status='invoiced'
+    
+#create invoice button visible only in fee pending(computed)
 
-    pending_semester=fields.Boolean(compute="_fee_status_is_pending",
-                                    string="is_pending")
-
-    @api.depends('admission_semesterline_ids.fee_status')
     def _fee_status_is_pending(self):
-        # for rec in self:
-        #     rec.pending_semester = False
-        #     for i in rec.admission_semesterline_ids:
-        #         if i.fee_status=='pending':
-        #             rec.pending_semester=True
 
         for rec in self:
+
             rec.pending_semester = bool(
                 rec.admission_semesterline_ids.filtered(
                     lambda l: l.fee_status == 'pending'
                 )
             )
+        # for rec in self:
+        #     rec.pending_semester = False
+        #     for i in rec.admission_semesterline_ids:
+        #         if i.fee_status=='pending':
+        #             rec.pending_semester=True
+         
+# Create Invoice
 
     def action_create_invoice(self):
+#find pending line and create invoice for that
+
         self.ensure_one()
 
         pending_line=self.admission_semesterline_ids.filtered(
             lambda l:l.fee_status == 'pending'
         )
+        pending_line = pending_line
+
+        if pending_line:
+
+            invoice = self.env['account.move'].create({
+                'move_type': 'out_invoice',
+                'partner_id': self.name.partner_id.id,
+                #Many2one 
+                'admission_id': self.id, 
+                'invoice_line_ids': [(0, 0, {
+                    'name':f"{self.course.name}\n{self.Admission_Number}\n Semester {pending_line.semester_number}",
+                    # 'product_id': self.course.id,
+                    'product_id':self.course.product_variant_id.id,
+                    'quantity': 1,
+                    # 'price_unit': self.course.list_price,
+                    'price_unit':pending_line.semester_fee
+                })]
+            })
         if not pending_line:
             return
+            
 
-        pending_line.ensure_one()
+#call action_post to make invoice posted on creation
 
-        invoice = self.env['account.move'].create({
-            'move_type': 'out_invoice',
-            'partner_id': self.name.partner_id.id,
-            'admission_id': self.id, 
-            'invoice_line_ids': [(0, 0, {
-                'name':f"{self.course.name}\n{self.Admission_Number}\n Semester {pending_line.semester_number}",
-                # 'product_id': self.course.id,
-                'product_id':self.course.product_variant_id.id,
-                'quantity': 1,
-                # 'price_unit': self.course.list_price,
-                'price_unit':pending_line.semester_fee
-            })]
-        })
-        self.status = 'invoiced'
+        invoice.action_post()
+
+        if invoice.status_in_payment == 'posted':
+            pending_line.fee_status='paid'
+
+#make next line pending
+
+        next_line=self.admission_semesterline_ids.filtered(
+            lambda l:l.semester_number == pending_line.semester_number + 1
+        )  
+        if next_line:
+            next_line.fee_status ='pending' 
+
+ #send mail to teacher when status=pending
+
+            teacher_template = self.env.ref(
+                                    'college_management.email_template_teacher_admission')
+                                                
+            if teacher_template:
+                teacher_template.send_mail(self.id,force_send=False)
+
+        
+#activity to teacher  
     
+                activity = self.env['mail.activity'].create({
+                    'summary': 'Follow Up',
+                    'note': 'Schedule follow up with student',
+                    'res_model_id': self.env['ir.model']._get_id('college.student.admission'),
+                    'res_id': self.id,
+                    'user_id': self.assigned_teacher.user_id.id,
+                    'date_deadline':fields.Date.today()
+        })
+ 
+        else:
+            self.status = "invoiced"
+
+
         return {
             'type': 'ir.actions.act_window',
             'name': 'Invoice',
@@ -185,6 +245,9 @@ class CollegeStudentAdmission(models.Model):
             'view_mode': 'form',
             'res_id': invoice.id,
         }
+
+
+#smart button view
 
     def action_view_invoice(self):
     
@@ -196,9 +259,11 @@ class CollegeStudentAdmission(models.Model):
             "name": "Invoices",
             'view_mode': 'list,form',
         }
-        
-   
+
+# Count in Smart Button
+
     def _compute_invoice_count(self):
+
         for rec in self:
             rec.invoice_count = self.env['account.move'].search_count([
             ('admission_id', '=', rec.id),
@@ -206,13 +271,18 @@ class CollegeStudentAdmission(models.Model):
             ('state','in',['draft','posted'])
         ])
 
+# Amount paid in Admission Form
+
     def sum_invoice_amount(self):
+
         for rec in self:
             sum=0
             for i in rec.invoice_id:
                 if i.status_in_payment=='paid':
                     sum+=i.amount_total
             rec.paid_amount=sum
+
+# Balance Amount to be paid in Admission form
 
     def balance_invoice_amount(self):
         for rec in self:

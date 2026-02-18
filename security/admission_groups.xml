@@ -1,0 +1,8 @@
+<odoo>
+    <record id="admission_officer" model="res.groups">
+        <field name="name">AdmissionOfficer</field>
+    </record>
+    <record id="admission_manager" model="res.groups">
+        <field name="name">AdmissionManager</field>
+    </record>
+</odoo>
